@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../static/admin/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../static/admin/css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form" id="app">
+    <form> 
+      <input type="hidden" name="ban_img" lay-verify="required" lay-reqtext="轮播图名称不能为空" placeholder="请输入轮播图名称" value="" class="layui-input" id="banimg">
+   
+      <div class="layui-form-item">
+          <label class="layui-form-label required">轮播图名称</label>
+          <div class="layui-input-block">
+              <input type="text" name="ban_name" lay-verify="required" lay-reqtext="轮播图名称不能为空" placeholder="请输入轮播图名称" value="" class="layui-input">
+          </div>
+      </div>
+    <div class="layui-form-item">
+    <label class="layui-form-label">轮播图类型</label>
+    <div class="layui-input-block">
+      <select name="bantype" lay-verify="required">
+        <{foreach $nav_info as $val}>
+        <option value="<{$val['nav_id']}>"><{$val['nav_name']}></option>
+        <{/foreach}>
+      </select>
+    </div>
+  </div>
+    <div class="layui-form-item">
+         <label class="layui-form-label">预览</label>
+         <div>
+             <img src="" id="imgs" width="200" height="200">
+         </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">轮播图</label>
+        <div>
+            <button type="button" class="layui-btn" id="test1">
+                 <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn" >确认保存</button>
+        </div>
+    </div>
+  </form>
+</div>
+<script src="../../static/admin/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../static/admin/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+
+<script type="text/javascript">
+    layui.use(['upload','form'], function(){
+       var form = layui.form,
+        layer = layui.layer,
+        $ = layui.$;
+       var upload = layui.upload;
+       
+      //执行实例
+      var uploadInst = upload.render({
+        elem: '#test1' //绑定元素
+        ,url: 'upload.php' //上传接口
+         ,before: function(obj){
+           layer.load(); 
+        }
+        ,done: function(res, index, upload){
+           if(res.code==1){
+                setTimeout("layer.closeAll('loading')",2000);
+                setTimeout("layer.msg('上传成功')",3000);
+                var img = res.imgpath;
+                var imgs  = document.getElementById('imgs');
+                var navimg  = document.getElementById('banimg');
+                navimg.value=img;
+                imgs.src = img;
+
+                
+           }
+        }
+        ,error: function(){
+          //请求异常回调
+        }
+      });
+
+      //监听提交
+        form.on('submit(saveBtn)', function (data) {
+           var datas = JSON.stringify(data.field);
+           $.ajax({
+             type: "POST",
+             url: "/adminapi/banner.php",
+             data: datas,
+             success: function(msg){
+                 layer.msg('新增成功', { icon: 1, time: 1000 }, function () {
+                   
+                 });
+                 setTimeout(function(){ window.location.href="b.html";;
+                 }, 2000);
+             }
+          });
+
+          
+        });
+
+
+
+
+
+
+    });
+
+</script>
+
+
+</body>
+</html>
